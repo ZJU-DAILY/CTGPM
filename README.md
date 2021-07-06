@@ -35,7 +35,7 @@ All data in experiments is available at [Google Drive]().
 
 # Usage
 
-1. Download the whole data from [Google Drive]() or generate by yourself with the code in [PRE](https://github.com/ZJU-DBL/CTGPM/tree/main/PRE). 
+1. Download the whole data from [Google Drive]() or generate by yourself with the code in [PRE](https://github.com/ZJU-DBL/CTGPM/tree/main/PRE) and the datasets from above link. 
 2. Put the data in the corresponding code folder.
 3. Use CMakeLists.txt to compile code.
 4. Run the corresponding file.
