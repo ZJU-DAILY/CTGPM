@@ -27,7 +27,7 @@ All data in experiments is available at [Google Drive]().
 | Algorithm | Paper |
 | :----: | :----: |
 | Timing | [Time Constrained Continuous Subgraph Search over Streaming Graphs](https://github.com/pkumod/timingsubg)
-| OPMA$^+$ | Time-respecting flow graph matching  |
+| OPMA$^+$ | Time-respecting Flow Graph Pattern Matching on Temporal Graphs  |
 | [WTmatch](https://github.com/ZJU-DBL/CTGPM/tree/main/WTmatch) |  |
 | [BCTmatch](https://github.com/ZJU-DBL/CTGPM/tree/main/DTmatch_n_BCTmatch) | |
 | [DTmatch-R](https://github.com/ZJU-DBL/CTGPM/tree/main/DTmatch_n_BCTmatch) |  |
