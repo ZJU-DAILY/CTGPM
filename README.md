@@ -40,15 +40,4 @@ All data in experiments is available at [Google Drive]().
 3. Use CMakeLists.txt to compile code.
 4. Run the corresponding file.
 
-# Citation
-
-If you use our code for research work, please cite our paper as below:
-
-```
-@article{,
-  title={Towards Efficient Constrained Temporal Graph Pattern Matching},
-  author={Tianming Zhang, Xinwei Cai, Lu Chen, Yunjun Gao, Jing Fan},
-  year={2021},
-}
-```
 
