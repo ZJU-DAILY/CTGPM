@@ -1,6 +1,6 @@
 # CTGPM
 
-This repository contains the code used in our paper: **Towards Efficient Constrained Temporal Graph Pattern Matching**.
+This repository contains the code used in our paper: **Towards Efficient Simulation-based Constrained Temporal Graph Pattern Matching**.
 
 # Requirements
 
@@ -28,10 +28,8 @@ All data in experiments is available at [Google Drive](https://drive.google.com/
 | :----: | :----: |
 | Timing | [Time Constrained Continuous Subgraph Search over Streaming Graphs](https://github.com/pkumod/timingsubg)
 | OPMA$^+$ | Time-respecting Flow Graph Pattern Matching on Temporal Graphs  |
-| [WTmatch](https://github.com/ZJU-DBL/CTGPM/tree/main/WTmatch) |  |
-| [BCTmatch](https://github.com/ZJU-DBL/CTGPM/tree/main/DTmatch_n_BCTmatch) | |
-| [DTmatch-R](https://github.com/ZJU-DBL/CTGPM/tree/main/DTmatch_n_BCTmatch) |  |
-| [DTmatch](https://github.com/ZJU-DBL/CTGPM/tree/main/DTmatch_n_BCTmatch) |  |
+| [WTmatch](https://github.com/ZJU-DBL/CTGPM/tree/main/WTmatch) | |
+| [BCTmatch, DTmatch-R, DTmatch](https://github.com/ZJU-DBL/CTGPM/tree/main/DTmatch_n_BCTmatch) |  |
 
 # Usage
 
