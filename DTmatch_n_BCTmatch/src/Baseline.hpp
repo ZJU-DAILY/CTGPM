@@ -1,18 +1,14 @@
-#ifndef MATCH_BASELINE_H
-#define MATCH_BASELINE_H
+/*
+ * Copyright (c) 2021 by Contributors
+ * \file Baseline.hpp
+ * \date 2021-10
+ * \author Xinwei Cai
+ */
+#pragma once
 
-#include <random>
-#include <set>
-#include <list>
-#include <cmath>
-#include <queue>
-#include <vector>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <iostream>
-#include "DataGraph.h"
-#include "PatternGraph.h"
+#include "DataGraph.hpp"
+#include "PatternGraph.hpp"
+#include "MatchGraph.hpp"
 
 struct Baseline {
     const DataGraph &data_graph;
@@ -22,11 +18,11 @@ struct Baseline {
 
     Baseline(const DataGraph &dg,
              const PatternGraph &pg) : data_graph(dg), pattern_graph(pg) {
-//        std::cout << data_graph.graph_data.size() << '\n';
-//        std::cout << pattern_graph.graph_data.size() << '\n';
+        //        std::cout << data_graph.graph_data.size() << '\n';
+        //        std::cout << pattern_graph.graph_data.size() << '\n';
     }
 
-    int match2(int l_hop, int S, int A, int k) {
+    int BCTmatch(int l_hop, int S, int A, int k) {
         match_graphs.clear();
 
         std::list<Path> paths;
@@ -75,13 +71,15 @@ struct Baseline {
                         ss_edge[{s_label, data_nodes[id].label}] = {--paths.end()};
                     }
                 }
-                for (const auto &adj_edge : data_nodes[id].adj_edge) {
+                for (const auto &adj_id : data_nodes[id].adj_edge) {
+                    auto &adj_edge = data_graph.edges[adj_id];
                     if (adj_edge.start_time < en_time) continue;
                     if (adj_edge.end_time > A) continue;
                     dfs(st_time, adj_edge.end_time, adj_edge.destination_seq, len + 1);
                 }
             };
-            for (const auto &edge : node.adj_edge) {
+            for (const auto &edge_id : node.adj_edge) {
+                auto &edge = data_graph.edges[edge_id];
                 if (edge.start_time < S) continue;
                 dfs(edge.start_time, edge.end_time, edge.destination_seq, 1);
             }
@@ -107,7 +105,7 @@ struct Baseline {
                     auto tmp_ptr = ptr;
                     ptr++;
                     bool satisfy = true;
-                    int min_max_start_time = std::numeric_limits<int>::max();
+                    int min_max_start_time = I32_MAX;
                     for (const auto &spaths : adj_path) {
                         bool exits = false;
                         int max_start_time = -1;
@@ -127,7 +125,7 @@ struct Baseline {
                             if (pattern_nodes[rev_seq].adj_edge[edge_i] != seq) continue;
                             auto &spaths = sim_adj_paths[rev_seq][edge_i];
                             bool exits = false;
-                            int min_end_time = std::numeric_limits<int>::max();
+                            int min_end_time = I32_MAX;
                             for (const auto &path_ptr : spaths) {
                                 if ((*path_ptr).destination_seq == snode) {
                                     exits = true;
@@ -135,11 +133,11 @@ struct Baseline {
                                 }
                             }
                             satisfy &= exits;
-                            if (min_end_time != std::numeric_limits<int>::max()) max_min_end_time = std::max(max_min_end_time, min_end_time);
+                            if (min_end_time != I32_MAX) max_min_end_time = std::max(max_min_end_time, min_end_time);
                         }
                     }
                     if (!satisfy) {
-//                        std::cout << data_nodes[snode].identity << " out\n";
+                        //                        std::cout << data_nodes[snode].identity << " out\n";
                         sim_node[seq].erase(tmp_ptr);
                         for (auto & spaths : adj_path) {
                             for (auto it = spaths.begin(); it != spaths.end();) {
@@ -168,7 +166,7 @@ struct Baseline {
                             auto tmp_it = it;
                             ++it;
                             if ((*tmp_it)->source_seq == snode && (*tmp_it)->start_time < max_min_end_time) {
-//                                std::cout << data_nodes[snode].identity << ' ' << data_nodes[(*tmp_it)->destination_seq].identity << " erase\n";
+                                //                                std::cout << data_nodes[snode].identity << ' ' << data_nodes[(*tmp_it)->destination_seq].identity << " erase\n";
                                 sapaths.erase(tmp_it);
                                 change = true;
                             }
@@ -183,7 +181,7 @@ struct Baseline {
                                 auto tmp_it = it;
                                 ++it;
                                 if ((*tmp_it)->destination_seq == snode && (*tmp_it)->end_time > min_max_start_time) {
-//                                    std::cout << data_nodes[(*tmp_it)->source_seq].identity << ' ' << data_nodes[snode].identity << " erase\n";
+                                    //                                    std::cout << data_nodes[(*tmp_it)->source_seq].identity << ' ' << data_nodes[snode].identity << " erase\n";
                                     spaths.erase(tmp_it);
                                     change = true;
                                 }
@@ -239,14 +237,12 @@ struct Baseline {
 
         std::sort(match_graphs.begin(), match_graphs.end(),
                   [&](const auto &lhs, const auto &rhs) {
-                      return lhs.score > rhs.score;
-                  });
+            return lhs.score > rhs.score;
+        });
         for (int i = 0; i < std::min(k, (int)match_graphs.size()); ++i) {
             match_graphs[i].remapping();
             // match_graphs[i].print_detail();
         }
-        return match_graphs.size();
+        return (int) match_graphs.size();
     }
 };
-
-#endif //MATCH_BASELINE_H

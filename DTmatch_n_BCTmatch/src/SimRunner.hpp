@@ -1,10 +1,15 @@
-#ifndef MATCH_RUNNER_H
-#define MATCH_RUNNER_H
+/*
+ * Copyright (c) 2021 by Contributors
+ * \file SimRunner.hpp
+ * \date 2021-10
+ * \author Xinwei Cai
+ */
+#pragma once
 
-#include <random>
-
-#include "Fraction.h"
-#include "MatchGraph.h"
+#include "Fraction.hpp"
+#include "MatchGraph.hpp"
+#include "PatternGraph.hpp"
+#include "DependencyGraph.hpp"
 
 struct SimRunner {
     const int L;
@@ -17,8 +22,8 @@ struct SimRunner {
 
     explicit SimRunner(int _l, int _s, int _t, const DependencyGraph &_depg, const PatternGraph &_pg,
                        const std::vector<std::set<int>> &_ss) : L(_l), S(_s), T(_t), dep_graph(_depg),
-                                                                                pt_graph(_pg),
-                                                                                search_spaces(_ss) {}
+                       pt_graph(_pg),
+                       search_spaces(_ss) {}
 
     int operator()(int x = 1) {
         const auto &sub_graphs = dep_graph.sub_graphs;
@@ -55,7 +60,7 @@ struct SimRunner {
             for (const auto &piv : candidates[i]) {
                 std::vector<std::pair<int, std::set<int>>> adj_paths(pattern_nodes[i].adj_edge.size(), {-1, {}});
                 std::vector<std::map<int, std::map<Pos, int>>> tmp_candidates(pattern_nodes.size());
-                int pre_paths_size = paths.size();
+                int pre_paths_size = (int) paths.size();
                 for (const auto &u : piv.second) {
                     std::function<void(int, int, Pos, int, bool)> dfs = [&](int stime, int etime, Pos now, int len, bool flag) {
                         if (len > L) return;
@@ -94,13 +99,15 @@ struct SimRunner {
                                 dfs(stime, etime, e, len, false);
                             }
                         }
-                        for (const auto &adj_edge : sub_graphs[now.first].graph_data[now.second].adj_edge) {
+                        for (const auto &adj_edge_id : sub_graphs[now.first].graph_data[now.second].adj_edge) {
+                            auto &adj_edge = sub_graphs[now.first].edges[adj_edge_id];
                             if (adj_edge.start_time < etime) continue;
                             if (adj_edge.end_time > T) continue;
                             dfs(stime, adj_edge.end_time, std::make_pair(now.first, adj_edge.destination_seq), len + 1, true);
                         }
                     };
-                    for (const auto &edge : sub_graphs[u.first.first].graph_data[u.first.second].adj_edge) {
+                    for (const auto &edge_id : sub_graphs[u.first.first].graph_data[u.first.second].adj_edge) {
+                        auto &edge = sub_graphs[u.first.first].edges[edge_id];
                         if (edge.start_time < u.second || edge.end_time > T) continue;
                         dfs(edge.start_time, edge.end_time, std::make_pair(u.first.first, edge.destination_seq), 1, true);
                     }
@@ -115,7 +122,7 @@ struct SimRunner {
                 if (!flag) {
                     while ((int) paths.size() != pre_paths_size) paths.pop_back();
                 } else {
-                    int min_max_stime = std::numeric_limits<int>::max();
+                    int min_max_stime = I32_MAX;
                     for (const auto &st : adj_paths) {
                         min_max_stime = std::min(min_max_stime, st.first);
                     }
@@ -137,7 +144,7 @@ struct SimRunner {
         for (int i = (int) pattern_nodes.size() - 1; i >= 0; --i) {
             if (!pt_graph.is_destination[i]) continue;
             for (const auto &e : candidates[i]) {
-                sim_nodes_childs[i][e.first] = {std::numeric_limits<int>::max(), {}};
+                sim_nodes_childs[i][e.first] = {I32_MAX, {}};
             }
         }
         // reverse topo order && build parents table
@@ -154,7 +161,7 @@ struct SimRunner {
                         ++edge_ptr;
                         int to = paths[(*tmp_edge_ptr)].destination_seq, etime = paths[(*tmp_edge_ptr)].end_time;
                         if (!sim_nodes_childs[pattern_nodes[i].adj_edge[j]].count(to) ||
-                            etime > sim_nodes_childs[pattern_nodes[i].adj_edge[j]][to].first) {
+                        etime > sim_nodes_childs[pattern_nodes[i].adj_edge[j]][to].first) {
                             edge_set.second.erase(tmp_edge_ptr);
                         }
                     }
@@ -174,9 +181,9 @@ struct SimRunner {
                 }
                 // update min_max_stime && build parents table
                 if (!sim_nodes_parents[i].count((*tmp_node_ptr).first)) {
-                    sim_nodes_parents[i][(*tmp_node_ptr).first] = {-1, std::vector<std::pair<int, std::set<int>>>(pattern_nodes[i].rev_edge.size(), {std::numeric_limits<int>::max(), {}})};
+                    sim_nodes_parents[i][(*tmp_node_ptr).first] = {-1, std::vector<std::pair<int, std::set<int>>>(pattern_nodes[i].rev_edge.size(), {I32_MAX, {}})};
                 }
-                (*tmp_node_ptr).second.first = std::numeric_limits<int>::max();
+                (*tmp_node_ptr).second.first = I32_MAX;
                 for (int j = 0; j < (int) pattern_nodes[i].adj_edge.size(); ++j) {
                     (*tmp_node_ptr).second.first = std::min((*tmp_node_ptr).second.first,
                                                             (*tmp_node_ptr).second.second[j].first);
@@ -185,7 +192,7 @@ struct SimRunner {
                         int to = paths[edge_id].destination_seq, etime = paths[edge_id].end_time;
                         if (!sim_nodes_parents[ii].count(to)) {
                             std::vector<std::pair<int, std::set<int>>> rev_paths(pattern_nodes[ii].rev_edge.size(),
-                                                                                 {std::numeric_limits<int>::max(), {}});
+                                                                                 {I32_MAX, {}});
                             rev_paths[jj].second.insert(edge_id);
                             rev_paths[jj].first = etime;
                             sim_nodes_parents[ii][to] = {etime, rev_paths};
@@ -215,7 +222,7 @@ struct SimRunner {
         for (int i = 0; i < (int) pattern_nodes.size(); ++i) {
             if (pt_graph.is_root[i]) continue;
             std::vector<std::pair<int, Fraction>> order(importance[i].begin(), importance[i].end());
-//            std::shuffle(order.begin(), order.end(), std::mt19937(std::random_device()()));
+            //            std::shuffle(order.begin(), order.end(), std::mt19937(std::random_device()()));
             std::sort(order.begin(), order.end(), [](const auto &lhs, const auto &rhs) {
                 return rhs.second < lhs.second;
             });
@@ -232,7 +239,7 @@ struct SimRunner {
                         int max_min_etime = -1;
                         for (int j = 0; j < (int) sim_nodes_parents[v][u].second.size(); ++j) {
                             const auto [vv, jj] = (*pt_graph.rev_to_adj.find({v, j})).second;
-                            int min_etime = std::numeric_limits<int>::max();
+                            int min_etime = I32_MAX;
                             auto &edge_set = sim_nodes_parents[v][u].second[j].second;
                             for (auto edge_ptr = edge_set.begin(); edge_ptr != edge_set.end();) {
                                 const auto tmp_edge_ptr = edge_ptr;
@@ -260,7 +267,7 @@ struct SimRunner {
                     auto update_childs = [&]() {
                         bool res = false;
                         const int etime = sim_nodes_parents[v][u].first;
-                        int min_max_stime = std::numeric_limits<int>::max();
+                        int min_max_stime = I32_MAX;
                         for (int j = 0; j < (int) sim_nodes_childs[v][u].second.size(); ++j) {
                             const auto[vv, jj] = (*pt_graph.adj_to_rev.find({v, j})).second;
                             int max_stime = -1;
@@ -296,7 +303,7 @@ struct SimRunner {
                                 min_max_stime = std::min(min_max_stime, max_stime);
                             }
                         }
-                        if (min_max_stime != std::numeric_limits<int>::max())
+                        if (min_max_stime != I32_MAX)
                             sim_nodes_childs[v][u].first = min_max_stime;
                         return res;
                     };
@@ -381,8 +388,6 @@ struct SimRunner {
             match_graphs.back().remapping();
             match_graphs.back().calculate_score();
         }
-        return match_graphs.size();
+        return (int) match_graphs.size();
     }
 };
-
-#endif //MATCH_RUNNER_H

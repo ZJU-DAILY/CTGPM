@@ -1,11 +1,12 @@
-#ifndef MATCH_PATTERNGRAPH_H
-#define MATCH_PATTERNGRAPH_H
+/*
+ * Copyright (c) 2021 by Contributors
+ * \file PatternGraph.hpp
+ * \date 2021-10
+ * \author Xinwei Cai
+ */
+#pragma once
 
-#include <map>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include "Basic.h"
+#include "Base.hpp"
 
 struct PatternGraph {
     std::vector<PatternNode> graph_data;
@@ -60,15 +61,13 @@ struct PatternGraph {
             if (degree[i].first == 0) is_root[i] = true;
             if (degree[i].second == 0) is_destination[i] = true;
         }
-//        std::cout << graph_data.size() << '\n';
-//        for (auto node : graph_data) {
-//            for (auto edge : node.adj_edge) {
-//                std::cout << node.seq << ' ' << edge << '\n';
-//            }
-//        }
+        //        std::cout << graph_data.size() << '\n';
+        //        for (auto node : graph_data) {
+        //            for (auto edge : node.adj_edge) {
+        //                std::cout << node.seq << ' ' << edge << '\n';
+        //            }
+        //        }
         // std::cout << "set pattern-graph " << file_name << " successfully!\n";
         infile.close();
     }
 };
-
-#endif //MATCH_PATTERNGRAPH_H

@@ -1,7 +1,12 @@
-#ifndef MATCH_FRACTION_H
-#define MATCH_FRACTION_H
+/*
+ * Copyright (c) 2021 by Contributors
+ * \file Fraction.hpp
+ * \date 2021-10
+ * \author Xinwei Cai
+ */
+#pragma once
 
-#include <iostream>
+#include <Core.h>
 
 struct Fraction {
     int fz, fm;
@@ -55,5 +60,3 @@ struct Fraction {
         return out;
     }
 };
-
-#endif //MATCH_FRACTION_H

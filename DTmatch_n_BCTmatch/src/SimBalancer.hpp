@@ -1,9 +1,12 @@
-#ifndef MATCH_BALANCER_H
-#define MATCH_BALANCER_H
+/*
+ * Copyright (c) 2021 by Contributors
+ * \file SimBalancer.hpp
+ * \date 2021-10
+ * \author Xinwei Cai
+ */
+#pragma once
 
-#include <atomic>
-#include <thread>
-#include "SimRunner.h"
+#include "SimRunner.hpp"
 
 struct SimBalancer {
     const int THREAD_SIZE;
@@ -17,8 +20,8 @@ struct SimBalancer {
 
     explicit SimBalancer(int _ts, int _l, int _k, int _s, int _t, const DependencyGraph &_depg, const PatternGraph &_pg,
                          const std::vector<std::set<int>> &_ss) : THREAD_SIZE(_ts), L(_l), K(_k), S(_s),
-                                                                                  T(_t), dep_graph(_depg),
-                                                                                  pt_grpah(_pg), search_spaces(_ss) {}
+                         T(_t), dep_graph(_depg),
+                         pt_grpah(_pg), search_spaces(_ss) {}
 
     int launch() {
         match_graphs.clear();
@@ -54,5 +57,3 @@ struct SimBalancer {
         return match_graphs.size();
     }
 };
-
-#endif //MATCH_BALANCER_H

@@ -1,12 +1,19 @@
-cmake_minimum_required(VERSION 3.17)
-project(Match)
+cmake_minimum_required(VERSION 3.15)
+project(CTGPM)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "${CAMKE_CXX_FLAGS} -pthread -O3")
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release" "Debug")
+endif()
 
-add_executable(run1 main.cpp  Basic.h PatternGraph.h DataGraph.h Baseline.h DependencyGraph.h SubGraph.h DisjointSetUnion.h SimRunner.h SimBalancer.h Fraction.h MatchGraph.h)
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG  "-O0 -g2 -ggdb")
 
-add_executable(run2 syn.cpp  Basic.h PatternGraph.h DataGraph.h Baseline.h DependencyGraph.h SubGraph.h DisjointSetUnion.h SimRunner.h SimBalancer.h Fraction.h MatchGraph.h)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/src)
 
-add_executable(run3 smallcase.cpp  Basic.h PatternGraph.h DataGraph.h Baseline.h DependencyGraph.h SubGraph.h DisjointSetUnion.h SimRunner.h SimBalancer.h Fraction.h MatchGraph.h)
+#include_directories(${CMAKE_CURRENT_LIST_DIR}/3rdpart/boost/include)
+
+add_executable(main test/main.cpp)
+target_link_libraries(main pthread)

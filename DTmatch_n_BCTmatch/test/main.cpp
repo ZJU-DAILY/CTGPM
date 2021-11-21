@@ -1,10 +1,13 @@
+/*
+ * Copyright (c) 2021 by Contributors
+ * \file main.cpp
+ * \date 2021-10
+ * \author Xinwei Cai
+ */
 #include <chrono>
 
-#include "PatternGraph.h"
-#include "DataGraph.h"
-#include "DependencyGraph.h"
-#include "SimBalancer.h"
-#include "Baseline.h"
+#include "Baseline.hpp"
+#include "SimBalancer.hpp"
 
 int main() {
     auto time_cost = [](const auto st, const auto en) {
@@ -34,6 +37,7 @@ int main() {
                     std::cout << dep_graph.sub_graphs.size() << ' ' << node << '\n';
                     std::cout << "build dep cost :" << time_cost(time_st, time_en) << '\n';
                 }
+                continue;
 
                 std::vector<std::pair<std::string, std::string>> para = {
                         {"3", "1.15"}, {"4", "1.15"}, {"5", "1.15"},
@@ -41,19 +45,19 @@ int main() {
                         {"6", "1.05"}, {"6", "1.1"}, {"6", "1.2"}, {"6", "1.25"},
                         {"7", "1.15"},
                         {"8", "1.15"},
-                };
+                        };
                 for (const auto &[p1, p2] : para) {
                     std::string parameters = p1 + "-" + p2;
                     std::cout << parameters << '\n';
                     std::string out_file_name = "../Results/" + way + "-" + data_set + "-" + parameters + "-L" + std::to_string(L) +".csv";
                     std::ofstream of(out_file_name);
-                    for (int i = 0; i < 25; ++i) {
+                    for (int i = 0; i < 10; ++i) {
                         PatternGraph pattern_graph;
                         pattern_graph.loader(data_set + "/" + parameters + "/" + std::to_string(i) + ".p");
-                        if (way == "baseline") {
+                        if (way != "opt") {
                             Baseline bs(data_graph, pattern_graph);
                             auto time_st = std::chrono::system_clock::now();
-                            int num = bs.match2(L, S, T, K);
+                            int num = bs.BCTmatch(L, S, T, K);
                             auto time_en = std::chrono::system_clock::now();
                             std::cout << i << "     " << time_cost(time_st, time_en) << "     " << num << "\n";
                             of << i << ',' << time_cost(time_st, time_en) << ',' << num << "\n";

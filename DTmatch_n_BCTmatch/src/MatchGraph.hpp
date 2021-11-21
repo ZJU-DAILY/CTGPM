@@ -1,8 +1,12 @@
-#ifndef MATCH_MATCHGRAPH_H
-#define MATCH_MATCHGRAPH_H
+/*
+ * Copyright (c) 2021 by Contributors
+ * \file MatchGraph.hpp
+ * \date 2021-10
+ * \author Xinwei Cai
+ */
+#pragma once
 
-#include <map>
-#include "Basic.h"
+#include "Base.hpp"
 
 struct MatchGraph {
     std::vector<MatchNode> graph_data;
@@ -47,5 +51,3 @@ struct MatchGraph {
         }
     }
 };
-
-#endif //MATCH_MATCHGRAPH_H
